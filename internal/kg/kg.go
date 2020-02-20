@@ -9,16 +9,17 @@ import "fmt"
 import "io/ioutil"
 
 var APIKey = "Place your api key here"
-var api string = "https://kgsearch.googleapis.com/v1/entities:search"
+var api string = "https://kgsearch.googleapis.com/v1/entities:search?"
 
 // SearchGame find game info for query.
 func SearchGame(query string) ([]byte, error) {
-	u, _ := url.Parse(api)
-	u.Query().Add("query", query)
-	u.Query().Add("types", "VideoGame")
-	resp, err := http.Get(u.String())
+	qs := make(url.Values, 3)
+	qs.Add("query", query)
+	qs.Add("key", APIKey)
+	qs.Add("types", "VideoGame")
+	resp, err := http.Get(api + qs.Encode())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to query: %w", err)
 	}
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
